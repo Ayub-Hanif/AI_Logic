@@ -15,6 +15,7 @@ student_name = "Mohammad Ayub Hanif Saleh"
 ############################################################
 # Section 1: Propositional Logic
 ############################################################
+before = ", "
 
 class Expr(object):
     def __hash__(self):
@@ -34,8 +35,10 @@ class Atom(Expr):
     
     def __repr__(self):
         return f"Atom({self.name})"
+    
     def atom_names(self):
-        pass
+        return {self.name}
+    
     def evaluate(self, assignment):
         pass
     def to_cnf(self):
@@ -56,8 +59,10 @@ class Not(Expr):
     
     def __repr__(self):
         return f"Not({self.arg})"
+    
     def atom_names(self):
-        pass
+        return self.arg.atom_names()
+    
     def evaluate(self, assignment):
         pass
     def to_cnf(self):
@@ -77,10 +82,13 @@ class And(Expr):
         return False
 
     def __repr__(self):
-        args = ", ".join(repr(a) for a in self.conjuncts)
-        return f"And({args})"
+        return f"And({before.join(repr(a) for a in self.conjuncts)})"
     def atom_names(self):
-        pass
+        name = set()
+        for con in self.conjuncts:
+            name.update(con.atom_names())
+        return name
+    
     def evaluate(self, assignment):
         pass
     def to_cnf(self):
@@ -100,10 +108,14 @@ class Or(Expr):
         return False
 
     def __repr__(self):
-        args = ", ".join(repr(a) for a in self.disjuncts)
-        return f"Or({args})"
+        return f"Or({before.join(repr(a) for a in self.disjuncts)})"
+    
     def atom_names(self):
-        pass
+        name = set()
+        for dis in self.disjuncts:
+            name.update(dis.atom_names())
+        return name
+    
     def evaluate(self, assignment):
         pass
     def to_cnf(self):
@@ -126,8 +138,11 @@ class Implies(Expr):
 
     def __repr__(self):
         return f"Implies({self.left}, {self.right})"
+    
     def atom_names(self):
-        pass
+        #union of the both sides of the implies by using union function that I learned the union function when using it for my research project.
+        return self.left.atom_names().union(self.right.atom_names())
+
     def evaluate(self, assignment):
         pass
     def to_cnf(self):
@@ -151,7 +166,8 @@ class Iff(Expr):
         return f"Iff({self.left}, {self.right})"
 
     def atom_names(self):
-        pass
+        return self.left.atom_names().union(self.right.atom_names())
+
     def evaluate(self, assignment):
         pass
     def to_cnf(self):

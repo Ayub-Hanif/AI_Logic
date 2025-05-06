@@ -21,7 +21,26 @@ def test_atom_equality():
     print("a,b,c = map(Atom, 'abc')")
     print("And(a, Or(Not(b), c))")
     print(And(a, Or(Not(b), c)))
+    print("=====================================================================")
+    print("\nPropositional Logic - Test#3:\n ")
     print("--------------------------------------------------------------------")
+    print("Atom('a').atom_names()")
+    print(Atom("a").atom_names())
+    print("******************************")
+    print("Not (Atom('a')).atom_names()")
+    print(Not(Atom("a")).atom_names())
+    print("******************************")
+    print("a, b, c = map(Atom, 'abc')")
+    a, b, c = map(Atom, "abc")
+    print("expr = And(a, Implies(b, Iff(a,c)))")
+    expr = And(a, Implies(b, Iff(a, c)))
+    print("expr.atom_names()")
+    print(expr.atom_names())
+    print("******************************")
+    
+
+
+
 
           
 
