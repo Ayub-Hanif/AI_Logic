@@ -43,7 +43,10 @@ class Atom(Expr):
     
     #I think the easy was is to just check if its true or false by checking the name of the atom.
     def evaluate(self, assignment):
-        return bool(assignment[self.name])
+        if self.name not in assignment:
+            return False
+        else: 
+            return bool(assignment[self.name]) 
     
     def to_cnf(self):
         return self
@@ -243,7 +246,7 @@ class Iff(Expr):
 
     #I think this one is the same as the last eq function but this is insensitive.
     def __eq__(self, other):
-        if isinstance(Iff, other):
+        if isinstance(other, Iff):
             return {self.left, self.right} == {other.left, other.right}
         return False
 
