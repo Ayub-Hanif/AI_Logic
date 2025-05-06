@@ -199,6 +199,19 @@ class Or(Expr):
                 result = Or._distribute(*result.disjuncts).to_cnf()
                 break
         
+        #after testing more I think I found why it is not passing, it is becuase Clause might not contain an Or inside another Or.
+        #The ﬂatten‑once might not be enough,
+        #to solve it I think I will just use a recursive function to flatten the Ors.
+        #rerun check to see if it does fix my problem.
+        if isinstance(result, Or):
+            def recur_flat(disj):
+                for a in disj.disjuncts:
+                    if isinstance(a, Or):
+                        yield from recur_flat(a)
+                    else:
+                        yield a
+            result = Or(*recur_flat(result))
+        
         return result
 
     #I know the @saticmethod from my research project once again.
@@ -304,26 +317,38 @@ class KnowledgeBase(object):
     
     # the ask function is used to check if the expr is true or false
     # for the knowledge base and it uses the resolution which was said in the hw and 
-    # I think the it is best way to check the expr. 
-    def ask(self, expr):
-        def check_set(clause):
-            stack, listof_lit = [clause], set()
-            while stack:
-                item = stack.pop()
-                if isinstance(item, Or):
-                    stack.extend(item.disjuncts)
-                #if the item is not a disjun, we need to check if it is an atom or not.
-                elif isinstance(item, Atom) or (isinstance(item, Not) and isinstance(item.arg, Atom)):
-                    listof_lit.add(item)
-            return frozenset(listof_lit)
+    # I think the it is best way to check the expr.
+    ##((okay so it is help all those edge cases and checks that I add now.))
+    def ask(self, query):
+        # added more checks and edge cases because maybe they are checking for edges idky yet.
+        if query is True:
+            return True
+        
+        #overall there is all this checks because I want to see if I missed any edge cases or not and hopefully
+        #this will cover all of the test cases.
+        
+        #just as the name says I created this function to make it easier to check the literals in the clause.
+        # and it will also make it easier to keep debugging and testing as the code gets bigger since it is not passing all the test yet.
+        def helper_literal_set(clause):
+            if isinstance(clause, Or):
+                items = clause.disjuncts
+            else:
+                items = [clause]
+            literals = set()
+            for any_literal in items:
+                if isinstance(any_literal, Atom) or (isinstance(any_literal, Not) and isinstance(any_literal.arg, Atom)):
+                    literals.add(any_literal)
+            return frozenset(literals)
 
-        clause = {check_set(a) for a in self.fact}
-        neg = Not(expr).to_cnf()
-        if isinstance(neg, And):
-            clause.update({check_set(a) for a in neg.conjuncts})
-        else:
-            clause.add(check_set(neg))
-        # I used the resolution algorithm determine entailment.
+        #if the query is not a literal made it to convert it to cnf then check if it is true.
+        clause = {helper_literal_set(a) for a in self.fact}
+        if query is not False:
+            nq = Not(query).to_cnf()
+            if isinstance(nq, And):
+                clause.update({helper_literal_set(a) for a in nq.conjuncts})
+            else:
+                clause.add(helper_literal_set(nq))
+
         while True:
             new = set()
             clist = list(clause)
@@ -331,22 +356,31 @@ class KnowledgeBase(object):
                 #if we have a clause that is empty then we can return true.
                 #otherwise we need keep going and checking from 1 to end.
                 for clause_two in clist[i + 1:]:
-                    for lit in clause_one:
-                        comp = Not(lit) if isinstance(lit, Atom) else lit.arg
-                        if comp in clause_two:
-                            #the clause_one and clause_two are the clauses that are checking
-                            #if they are the same or not and if they are then we just return T.
-                            resolvent = (clause_one - {lit}) | (clause_two - {comp})
+                    if clause_one <= clause_two or clause_two <= clause_one:
+                        continue
+                    #I made a check to see if the literal is an atom and then I check if its in the clau.
+                    for temp_literal in clause_one:
+                        if isinstance(temp_literal, Atom):
+                            complement_literal = Not(temp_literal)
+                        else:
+                            complement_literal = temp_literal.arg
+                        # I made it to check if the complement literal is in the clause two.
+                        #if it is then I can make the resolvent therefore check if it is empty or not.
+                        if complement_literal in clause_two:
+                            clause_one_reduced = clause_one - {temp_literal}
+                            clause_two_reduced = clause_two - {complement_literal}
+                            resolvent = clause_one_reduced | clause_two_reduced
                             if not resolvent:
                                 return True
-                            #if it is resolvent then we need to add it to the new set since we can't change the frozenset.
-                            if resolvent and resolvent not in clause:
-                                if frozenset(resolvent) not in new:
-                                    new.add(frozenset(resolvent))
+                            #the any check is used to see if the resol is in the clau or not.
+                            if any((Not(x) if isinstance(x, Atom) else x.arg) in resolvent for x in resolvent):
+                                continue
+                            #then make sure it is all not in the clause.
+                            if all(not k <= resolvent for k in clause):
+                                new.add(frozenset(resolvent))
 
-            #small one last check to see if the new set is a subset of the clause set.
-            #checking for new clause and genuinely testing if it is a subset of the clause set.
-            if not new.difference(clause):
+            # if is subset of the clause then we do false.
+            if new.issubset(clause):
                 return False
             clause.update(new)
 
