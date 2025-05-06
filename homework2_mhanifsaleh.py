@@ -33,7 +33,7 @@ class Atom(Expr):
         return False
     
     def __repr__(self):
-        pass
+        return f"Atom({self.name})"
     def atom_names(self):
         pass
     def evaluate(self, assignment):
@@ -55,7 +55,7 @@ class Not(Expr):
         return False
     
     def __repr__(self):
-        pass
+        return f"Not({self.arg})"
     def atom_names(self):
         pass
     def evaluate(self, assignment):
@@ -77,7 +77,8 @@ class And(Expr):
         return False
 
     def __repr__(self):
-        pass
+        args = ", ".join(repr(a) for a in self.conjuncts)
+        return f"And({args})"
     def atom_names(self):
         pass
     def evaluate(self, assignment):
@@ -99,7 +100,8 @@ class Or(Expr):
         return False
 
     def __repr__(self):
-        pass
+        args = ", ".join(repr(a) for a in self.disjuncts)
+        return f"Or({args})"
     def atom_names(self):
         pass
     def evaluate(self, assignment):
@@ -123,7 +125,7 @@ class Implies(Expr):
         return False
 
     def __repr__(self):
-        pass
+        return f"Implies({self.left}, {self.right})"
     def atom_names(self):
         pass
     def evaluate(self, assignment):
@@ -141,12 +143,13 @@ class Iff(Expr):
 
     #I think this one is the same as the last eq function but this is insensitive.
     def __eq__(self, other):
-        if isinstance(other, Iff):
-            return {self.left, self.right} == {self.left == self.right}
+        if isinstance(self, other):
+            return {self.left, self.right} == {other.left, other.right}
         return False
 
     def __repr__(self):
-        pass
+        return f"Iff({self.left}, {self.right})"
+
     def atom_names(self):
         pass
     def evaluate(self, assignment):
