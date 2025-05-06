@@ -190,6 +190,15 @@ class Or(Expr):
             for d in result.disjuncts:
                 flat.extend(d.disjuncts if isinstance(d, Or) else [d])
             result = Or(*flat)
+        
+        #I keep failing the test I think it is the check for the nested And and if it is true then we need to do the distribution.
+        # The AND is inside the Or not equalling the Cnf but not sure we'll rerun it and see.
+        # good fixed one test I think but didn't fix all of them.
+        for a in result.disjuncts if isinstance(result, Or) else []:
+            if isinstance(a, And):
+                result = Or._distribute(*result.disjuncts).to_cnf()
+                break
+        
         return result
 
     #I know the @saticmethod from my research project once again.
@@ -331,10 +340,13 @@ class KnowledgeBase(object):
                             if not resolvent:
                                 return True
                             #if it is resolvent then we need to add it to the new set since we can't change the frozenset.
-                            new.add(frozenset(resolvent))
+                            if resolvent and resolvent not in clause:
+                                if frozenset(resolvent) not in new:
+                                    new.add(frozenset(resolvent))
 
             #small one last check to see if the new set is a subset of the clause set.
-            if new.issubset(clause):
+            #checking for new clause and genuinely testing if it is a subset of the clause set.
+            if not new.difference(clause):
                 return False
             clause.update(new)
 
