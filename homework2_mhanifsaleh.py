@@ -390,26 +390,20 @@ class KnowledgeBase(object):
 
 # Puzzle 1
 
-mythical = Atom("mythical")
-mortal = Atom("mortal")
-mammal = Atom("mammal")
-horned = Atom("horned")
-magical = Atom("magical")
-
 # Populate the knowledge base using statements of the form kb1.tell(...)
 kb1 = KnowledgeBase()
 
 #If the unicorn is mythical, then it is immortal
-kb1.tell(Implies(mythical, Not(mortal)))
+kb1.tell(Implies(Atom("mythical"), Not(Atom("mortal"))))
 
 #but if it is not mythical, then it is a mortal mammal
-kb1.tell(Implies(Not(mythical), And(mortal, mammal)))
+kb1.tell(Implies(Not(Atom("mythical")), And(Atom("mortal"), Atom("mammal"))))
 
 # If the unicorn is either immortal or a mammal, then it is horned.
-kb1.tell(Implies(Or(Not(mortal), mammal), horned))
+kb1.tell(Implies(Or(Not(Atom("mortal")), Atom("mammal")), Atom("horned")))
 
 #The unicorn is magical if it is horned.
-kb1.tell(Implies(horned, magical))
+kb1.tell(Implies(Atom("horned"), Atom("magical")))
 
 
 
