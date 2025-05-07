@@ -390,19 +390,40 @@ class KnowledgeBase(object):
 
 # Puzzle 1
 
+mythical = Atom("mythical")
+mortal = Atom("mortal")
+mammal = Atom("mammal")
+horned = Atom("horned")
+magical = Atom("magical")
+
 # Populate the knowledge base using statements of the form kb1.tell(...)
 kb1 = KnowledgeBase()
 
+#If the unicorn is mythical, then it is immortal
+kb1.tell(Implies(mythical, Not(mortal)))
+
+#but if it is not mythical, then it is a mortal mammal
+kb1.tell(Implies(Not(mythical), And(mortal, mammal)))
+
+# If the unicorn is either immortal or a mammal, then it is horned.
+kb1.tell(Implies(Or(Not(mortal), mammal), horned))
+
+#The unicorn is magical if it is horned.
+kb1.tell(Implies(horned, magical))
+
+
+
+#idk if they want it like this??
 # Write an Expr for each query that should be asked of the knowledge base
-mythical_query = None
-magical_query = None
-horned_query = None
+mythical_query = Atom("mythical")  # the unicorn is mythical? 
+magical_query = Atom("magical") # the unicorn is magical?
+horned_query = Atom("horned") # the unicorn is horned?
 
 # Record your answers as True or False; if you wish to use the above queries,
 # they should not be run when this file is loaded
-is_mythical = None
-is_magical = None
-is_horned = None
+is_mythical = False
+is_magical = True
+is_horned = True
 
 # Puzzle 2
 
