@@ -454,7 +454,14 @@ kb3.tell(Iff(Atom("s1"), Not(Atom("s2"))))
 # Write your answer to the question in the assignment; the queries you make
 # should not be run when this file is loaded
 puzzle_3_question = """
-I think the room 1 is empty since room 2 have the prize and sign 1 is false because to
+just asked the Kb again and I got
+
+Kb3.ask(Atom("s1")) ==> False
+Kb3.ask(Atom("p1")) ==> False
+Kb3.ask(Atom("s2")) ==> True
+and so on. 
+
+I know the room 1 is empty since room 2 have the prize and sign 1 is false because to
 have the sign 1 false and sign 2 true then the prize is in room 2 and thus room 1 is empty.
 """
 
@@ -496,6 +503,13 @@ guilty_suspect = "Brown"
 
 # Describe the queries you made to ascertain your findings
 puzzle_4_question = """
-I think the guilty one is Brown because I asked the KB whether each victim is innocent or not.
+I forgot to add this again.
+
+I just asked simple question which gived me the answer by output the following
+kb4.ask(Atom("ia")) ==> True 
+kb4.ask(Atom("ib")) ==> False
+kb4.ask(Atom("ic")) ==> True
+
+I know the guilty one is Brown because I asked the KB whether each victim is innocent or not.
 I found that the adam is innocent and Clark is innocent but brown was guilty by getting false for him.
 """
