@@ -11,8 +11,6 @@ student_name = "Mohammad Ayub Hanif Saleh"
 # Include your imports here, if any are used.
 import itertools
 
-
-
 ############################################################
 # Section 1: Propositional Logic
 ############################################################
@@ -453,7 +451,6 @@ kb3.tell(Iff(Atom("s2"), And(Or(Atom("e1"),Atom("e2")), Or(Atom("p1"), Atom("p2"
 #only one sign can be true
 kb3.tell(Iff(Atom("s1"), Not(Atom("s2"))))
 
-
 # Write your answer to the question in the assignment; the queries you make
 # should not be run when this file is loaded
 puzzle_3_question = """
@@ -461,33 +458,39 @@ I think the room 1 is empty since room 2 have the prize and sign 1 is false beca
 have the sign 1 false and sign 2 true then the prize is in room 2 and thus room 1 is empty.
 """
 
-
 # Puzzle 4
 
 # Populate the knowledge base using statements of the form kb4.tell(...)
 kb4 = KnowledgeBase()
 
-#okay the test was failing bc I was using the AND at the end to find the guilty one but I don't think the 
-#gradescope is checking that way. so I'll keep it simple. And hopefully it will pass all.
+#finally got the last 3 tests to pass, it was very hard but stupidly simple since I didn't think
+#about the last case which I have to define :( Also this was the hardest part for me and simplest at the same time.
 
 # Adam is innocent and blame Brown indirectly and Clark is innocent.
 kb4.tell(Iff(Atom("ia"), And(Atom("kb"), Not(Atom("kc")))))
 
 #Brown says he didn't know the guy and he is innocent. Then Adam is lying.
+#kb4.tell(Iff(Atom("ib"), And(Not(Atom("ka")), Atom("kc"))))
+
+#Brown says he is innocent because he said he didn't know him.
 kb4.tell(Iff(Atom("ib"), Not(Atom("kb"))))
 
-#Clark says he is innocent and maybe one of them did it because he saw them downtown with the victim.
+#(((((((((((((now to clean up my code and resubmit..))))))))))))
+
+#Clark is innocent  bceause he says I didn't do it and I saw both Adam and Brown with him.
+#so he knew both possibly and one of them is guilty not Clark from what he said.
 kb4.tell(Iff(Atom("ic"), And(Atom("ka"), Atom("kb"))))
 
-#only one is guilty and other two are innocent since only one is lying.
-kb4.tell(Or(And(Atom("ia"), Atom("ib")), Atom("ic"))) #anyone of them can be guiltyy
-kb4.tell(Or(Not(Atom("ia")), Not(Atom("ib")))) #can't be both guilty ADam and Brown
-kb4.tell(Or(Not(Atom("ia")), Not(Atom("ic")))) # same but with Adam and Clark
-kb4.tell(Or(Not(Atom("ib")), Not(Atom("ic")))) # same but with Brown and Clark
+#to check and also combine since sometimes the test is passing with some conditions and some times it does not.
+#so I am making exactly 2 things are true and only one thing is false which will be guilty.
+kb4.tell(Or(And(Atom("ia"),   Atom("ib"),   Not(Atom("ic"))),
+            And(Atom("ia"),   Not(Atom("ib")), Atom("ic")),
+            And(Not(Atom("ia")), Atom("ib"),   Atom("ic"))
+            )
+        )
 
 # Uncomment the line corresponding to the guilty suspect
 # guilty_suspect = "Adams"
-guilty_query = Not(Atom("ib"))   
 guilty_suspect = "Brown"
 # guilty_suspect = "Clark"
 
